@@ -1,80 +1,88 @@
 # 📝 Telegram File Manager Bot
 
-A professional, asynchronous Telegram bot built with **aiogram 3.x** and
-**aiosqlite**.\
-It allows you to organize messages, media, and personal notes into
-custom categories with a clean hybrid interface.
+
+Профессиональный асинхронный Telegram-бот, написанный на **aiogram 3.x** и **aiosqlite**.\
+Позволяет организовывать сообщения, медиафайлы и личные заметкив пользовательские категории с удобным интерфейсом.
 
 ------------------------------------------------------------------------
 
-## 🚀 Features
+## 🚀 Функции
 
--   **Dynamic Categories** -- Create, rename, and delete categories at
-    runtime
--   **Universal Content Support** -- Save text, photos, videos,
-    documents, and more
--   **Hybrid UI** -- Reply keyboards for navigation and inline keyboards
-    for contextual actions
--   **Persistent Storage** -- Asynchronous SQLite database for reliable
-    performance
+
+-   **Динамические категории** — создание, переименование и удаление категорий в реальном времени.
+
+-   **Универсальная поддержка контента** — сохранение текста, фото, видео, документов и многого другого.
+  
+-   **Гибридный интерфейс** — Reply-клавиатуры для навигации и Inline-клавиатуры для контекстных действий.
+  
+-   **Надежное хранение** — асинхронная база данных SQLite для обеспечения стабильной производительности.
 
 ------------------------------------------------------------------------
-
-## 📂 Project Structure
+## 📂 Структура проекта
 
     .
-    ├── databases/          # SQLite storage directory
+    ├── databases/          # Директория для хранения базы данных SQLite
     ├── src/
-    │   └── main.py         # Main application entry point
-    ├── .env                # Private environment variables (DO NOT COMMIT)
-    ├── .gitignore          # Git exclusion rules
-    ├── requirements.txt    # Python dependencies
-    └── README.md           # Project documentation
+    │   └── main.py          # Главный файл входа в приложение
+    ├── .env                # Приватные переменные окружения (НЕ КОММИТИТЬ)
+    ├── .gitignore          # Правила исключения Git
+    ├── requirements.txt    # Зависимости Python
+    └── README.md           # Документация проекта
 
 ------------------------------------------------------------------------
+## 🛠 Установка
+### 1. Загрузка репозитория
+#### Способ А: Через интерфейс GitHub (для Windows)
 
-## 🛠 Installation
+1. Откройте страницу репозитория в браузере.
 
-### 1. Clone the Repository
+2. Нажмите на зеленую кнопку «Code» в верхней правой части списка файлов.
 
-``` bash
+3. В выпадающем меню выберите «Download ZIP».
+
+4. Распакуйте скачанный архив в удобную папку на вашем компьютере.
+
+#### Способ Б: Через командную строку (Git)
+
+```Bash
 git clone https://github.com/PATRUSOV/telegram-file-manager-bot.git
 cd telegram-file-manager-bot
 ```
 
-### 2. Fill Environment File
+### 2. Настройка переменных окружения
 
-Fill in the `.env` file in the project root:
+Заполните файл .env в корне проекта:
 
-``` env
-BOT_TOKEN="your_token_here"
+```env
+BOT_TOKEN="ваш_токен_бота"
 LOG_LEVEL="INFO"
 ```
 
-### 3. Install Dependencies
+### 3. Установка зависимостей
 
-``` bash
+```Bash
 pip install -r requirements.txt
 ```
 
-### 4. Run the Bot
+### 4. Запуск бота
 
-``` bash
+```Bash
 cd src
 python main.py
 ```
 
 ------------------------------------------------------------------------
 
-## ⚙️ Configuration
+## ⚙️ Конфигурация
 
-| Variable   | Description                                  | Default   |
-|------------|----------------------------------------------|-----------|
-| BOT_TOKEN  | Telegram Bot API token from BotFather        | None      |
-| LOG_LEVEL  | Logging level: DEBUG, INFO, WARNING, ERROR   | INFO      |
+| Переменная | Описание                                                     | Default   |
+|------------|--------------------------------------------------------------|-----------|
+| **BOT_TOKEN**  | Telegram Bot API token from BotFather                        | **None**  |
+| **LOG_LEVEL**  | Logging level: **DEBUG**, **INFO**, **WARNING**, **ERROR**   | **INFO**  |
 
 ------------------------------------------------------------------------
 
-## 📄 License
+## 📄 Лицензия
 
-This project is open-source and available under the MIT License.
+Этот проект является открытым исходным кодом и доступен по лицензии MIT.
+
