@@ -63,26 +63,26 @@ class KBs:
         async with db.execute("SELECT name FROM categories") as cursor:
             async for (name,) in cursor:
                 builder.add(KeyboardButton(text=f"📁 {name}"))
-        builder.add(KeyboardButton(text="⚙️ Manage Categories"))
+        builder.add(KeyboardButton(text="⚙️ Управление категориями"))
         builder.adjust(2)
         return builder.as_markup(resize_keyboard=True)
 
     @staticmethod
     def category_mgmt_list(categories: list) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
-        builder.button(text="➕ Add Category", callback_data=CatOpCB(action=Action.ADD_NEW))
+        builder.button(text="➕ Добавить категорию", callback_data=CatOpCB(action=Action.ADD_NEW))
         for cid, name in categories:
             builder.button(text=f"📂 {name}", callback_data=CatOpCB(action=Action.EDIT_ITEM, id=cid))
-        builder.button(text="⬅️ Back to Menu", callback_data=CatOpCB(action=Action.MAIN_MENU))
+        builder.button(text="⬅️ Назад в меню", callback_data=CatOpCB(action=Action.MAIN_MENU))
         builder.adjust(1)
         return builder.as_markup()
 
     @staticmethod
     def cat_edit_actions(cat_id: int) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
-        builder.button(text="✏️ Rename", callback_data=CatOpCB(action=Action.RENAME, id=cat_id))
-        builder.button(text="🔥 Delete", callback_data=CatOpCB(action=Action.DELETE, id=cat_id))
-        builder.button(text="⬅️ Back", callback_data=CatOpCB(action=Action.LIST_ALL))
+        builder.button(text="✏️ Переименовать", callback_data=CatOpCB(action=Action.RENAME, id=cat_id))
+        builder.button(text="🔥 Удалить", callback_data=CatOpCB(action=Action.DELETE, id=cat_id))
+        builder.button(text="⬅️ Назад", callback_data=CatOpCB(action=Action.LIST_ALL))
         builder.adjust(2, 1)
         return builder.as_markup()
 
@@ -97,7 +97,7 @@ async def delete_msg(bot: Bot, chat_id: int, mid: int):
 dp = Dispatcher()
 
 @dp.message(Command("start"))
-@dp.message(F.text == "❌ Cancel")
+@dp.message(F.text == "❌ Отмена")
 async def cmd_start(message: Message, db: aiosqlite.Connection, state: FSMContext):
     data = await state.get_data()
     await delete_msg(message.bot, message.chat.id, data.get("last_mid"))
@@ -105,12 +105,12 @@ async def cmd_start(message: Message, db: aiosqlite.Connection, state: FSMContex
     await state.clear()
     kb = await KBs.main_menu_reply(db)
     msg = await message.answer(
-        "🗂 **Main Menu**",
+        "🗂 **Главное меню**",
         reply_markup=kb,
         parse_mode="Markdown"
     )
     # Inline switcher for management
-    inline_kb = InlineKeyboardBuilder().button(text="⚙️ Manage Categories", callback_data=CatOpCB(action=Action.LIST_ALL)).as_markup()
+    inline_kb = InlineKeyboardBuilder().button(text="⚙️ Управление категориями", callback_data=CatOpCB(action=Action.LIST_ALL)).as_markup()
     await msg.edit_reply_markup(reply_markup=inline_kb)
     await state.update_data(last_mid=msg.message_id)
 
@@ -119,7 +119,7 @@ async def back_to_main_callback(call: CallbackQuery, db: aiosqlite.Connection, s
     await cmd_start(call.message, db, state)
     await call.answer()
 
-@dp.message(F.text == "⚙️ Manage Categories")
+@dp.message(F.text == "⚙️ Управление категориями")
 @dp.callback_query(CatOpCB.filter(F.action == Action.LIST_ALL))
 async def list_cats(event: Message | CallbackQuery, db: aiosqlite.Connection, state: FSMContext):
     cats = []
@@ -127,7 +127,7 @@ async def list_cats(event: Message | CallbackQuery, db: aiosqlite.Connection, st
         async for row in cursor: cats.append(row)
 
     kb = KBs.category_mgmt_list(cats)
-    text = "🛠 **Category Management**"
+    text = "🛠 **Управление категориями**"
 
     if isinstance(event, Message):
         data = await state.get_data()
@@ -163,15 +163,15 @@ async def show_content(message: Message, db: aiosqlite.Connection, state: FSMCon
     await state.set_state(BotState.in_category)
     await state.update_data(current_cat_id=cat_id, current_cat_name=cat_name)
 
-    b = ReplyKeyboardBuilder().add(KeyboardButton(text="❌ Cancel"))
-    msg = await message.answer(f"📍 Viewing: **{cat_name}**\n_Send anything to save it here._",
+    b = ReplyKeyboardBuilder().add(KeyboardButton(text="❌ Отмена"))
+    msg = await message.answer(f"📍 Просмотр: **{cat_name}**\n_Пришлите что угодно, чтобы сохранить здесь._",
                                parse_mode="Markdown", reply_markup=b.as_markup(resize_keyboard=True))
     await state.update_data(last_mid=msg.message_id)
 
 @dp.message(BotState.in_category)
 async def auto_save_handler(message: Message, state: FSMContext, db: aiosqlite.Connection):
     """Ловит всё, что прислано, пока юзер 'внутри' папки"""
-    if message.text == "❌ Cancel": return # Filter handled by main handler
+    if message.text == "❌ Отмена": return # Filter handled by main handler
 
     data = await state.get_data()
     cat_id = data.get("current_cat_id")
@@ -182,7 +182,7 @@ async def auto_save_handler(message: Message, state: FSMContext, db: aiosqlite.C
     )
     await db.commit()
     # Feedback without flooding
-    temp = await message.answer("✅ Saved to " + data.get("current_cat_name", "category"))
+    temp = await message.answer("✅ Сохранено в " + data.get("current_cat_name", "категорию"))
     await asyncio.sleep(1)
     await temp.delete()
 
@@ -191,12 +191,12 @@ async def delete_task(call: CallbackQuery, callback_data: CatOpCB, db: aiosqlite
     await db.execute("DELETE FROM tasks WHERE id = ?", (callback_data.id,))
     await db.commit()
     await call.message.delete()
-    await call.answer("Deleted")
+    await call.answer("Удалено")
 
 @dp.callback_query(CatOpCB.filter(F.action == Action.ADD_NEW))
 async def add_cat_init(call: CallbackQuery, state: FSMContext):
     await call.message.delete()
-    msg = await call.message.answer("Enter name:", reply_markup=ReplyKeyboardBuilder().add(KeyboardButton(text="❌ Cancel")).as_markup(resize_keyboard=True))
+    msg = await call.message.answer("Введите название:", reply_markup=ReplyKeyboardBuilder().add(KeyboardButton(text="❌ Отмена")).as_markup(resize_keyboard=True))
     await state.set_state(BotState.waiting_new_cat)
     await state.update_data(last_mid=msg.message_id)
 
@@ -208,7 +208,7 @@ async def save_cat(message: Message, state: FSMContext, db: aiosqlite.Connection
 
 @dp.callback_query(CatOpCB.filter(F.action == Action.EDIT_ITEM))
 async def edit_item_menu(call: CallbackQuery, callback_data: CatOpCB):
-    await call.message.edit_text(f"📝 Editing ID: {callback_data.id}", reply_markup=KBs.cat_edit_actions(callback_data.id))
+    await call.message.edit_text(f"📝 Редактирование ID: {callback_data.id}", reply_markup=KBs.cat_edit_actions(callback_data.id))
 
 @dp.callback_query(CatOpCB.filter(F.action == Action.DELETE))
 async def del_cat(call: CallbackQuery, callback_data: CatOpCB, db: aiosqlite.Connection, state: FSMContext):
@@ -216,6 +216,24 @@ async def del_cat(call: CallbackQuery, callback_data: CatOpCB, db: aiosqlite.Con
     await db.execute("DELETE FROM categories WHERE id = ?", (callback_data.id,))
     await db.commit()
     await cmd_start(call.message, db, state)
+    
+@dp.callback_query(CatOpCB.filter(F.action == Action.RENAME))
+async def rename_cat_init(call: CallbackQuery, callback_data: CatOpCB, state: FSMContext):
+    await call.message.delete()
+    msg = await call.message.answer(
+        "Введите новое название для категории:",
+        reply_markup=ReplyKeyboardBuilder().add(KeyboardButton(text="❌ Отмена")).as_markup(resize_keyboard=True)
+    )
+    await state.set_state(BotState.waiting_rename)
+    await state.update_data(edit_cat_id=callback_data.id, last_mid=msg.message_id)
+
+@dp.message(BotState.waiting_rename)
+async def storage_rename_cat(message: Message, state: FSMContext, db: aiosqlite.Connection):
+    data = await state.get_data()
+    cat_id = data.get("edit_cat_id")
+    await db.execute("UPDATE categories SET name = ? WHERE id = ?", (message.text, cat_id))
+    await db.commit()
+    await cmd_start(message, db, state)
 
 async def main():
     dotenv.load_dotenv()
